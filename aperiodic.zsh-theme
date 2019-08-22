@@ -12,16 +12,18 @@ function precmd {
     local promptsize=${#${(%):---(%n@%m:%l)-----()--}}
     local pwdsize=${#${(%):-%~}}
 
-    local git_prompt_info=${$(git_prompt_info)/git:/}
-    local git_prompt_info_size=${#${git_prompt_info}}
+    local git_prompt_info_text=$(git_prompt_info)
+    local git_prompt_info_size=${#${git_prompt_info_text/git:/}}
 
-    local virtualenv_prompt_info=${VIRTUAL_ENV##*/}
-    local virtualenv_prompt_info_size=${#virtualenv_prompt_info}
+    if [[ "$git_prompt_info_size" -gt 0 ]]; then
+        git_prompt_info_size=$(( git_prompt_info_size + 6 ))
+    fi
+
+    local virtualenv_prompt_info_text=${VIRTUAL_ENV##*/}
+    local virtualenv_prompt_info_size=${#virtualenv_prompt_info_text}
 
     if [[ "$virtualenv_prompt_info_size" -gt 0 ]]; then
-        echo "$virtualenv_prompt_info_size"
-        virtualenv_prompt_info_size=$((virtualenv_prompt_info_size+2))
-        echo "$virtualenv_prompt_info_size"
+        virtualenv_prompt_info_size=$((virtualenv_prompt_info_size + 7))
     fi
 
     if [[ "$promptsize + $pwdsize + $git_prompt_info_size + $virtualenv_prompt_info_size" -gt $TERMWIDTH ]]; then
@@ -57,6 +59,14 @@ setprompt () {
     # Need this so the prompt will work.
 
     setopt prompt_subst
+
+
+    ###
+    # Disable some already used prefix and suffix
+
+    unset ZSH_THEME_GIT_PROMPT_PREFIX
+    unset ZSH_THEME_GIT_PROMPT_SUFFIX
+    export VIRTUAL_ENV_DISABLE_PROMPT=1
 
 
     ###
@@ -129,36 +139,30 @@ setprompt () {
 
 
     ###
-    # virtualenv_prompt_info
-    if [[ ! -z "$VIRTUAL_ENV" ]]; then
-        virtualenv_prompt_info="(${VIRTUAL_ENV##*/})"
-    fi
-    
-    
-    ###
     # Finally, the prompt.
 
     PROMPT='$PR_SET_CHARSET$PR_STITLE${(e)PR_TITLEBAR}\
-$PR_CYAN$PR_SHIFT_IN$PR_ULCORNER$PR_BLUE$PR_HBAR$PR_SHIFT_OUT(\
-%(!.$PR_RED%SROOT%s.$PR_GREEN%n)@%m:%l\
-$PR_BLUE)$PR_SHIFT_IN$PR_BLUE$PR_HBAR$PR_SHIFT_OUT${$(git_prompt_info)/git:/}$PR_SHIFT_IN$PR_BLUE$PR_HBAR$PR_SHIFT_OUT${virtualenv_prompt_info}\
-$PR_SHIFT_IN$PR_HBAR$PR_CYAN$PR_HBAR${(e)PR_FILLBAR}$PR_BLUE$PR_HBAR$PR_SHIFT_OUT(\
+$PR_CYAN$PR_SHIFT_IN$PR_ULCORNER$PR_HBAR$PR_SHIFT_OUT(\
+%(!.$PR_RED%SROOT%s.$PR_GREEN%n)@%m:%l$PR_CYAN)\
+$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT$PR_MAGENTA${$(git_prompt_info):+"(git:$(git_prompt_info))"}$PR_CYAN\
+$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT$PR_MAGENTA${VIRTUAL_ENV:+"(venv:${VIRTUAL_ENV##*/})"}$PR_CYAN\
+$PR_SHIFT_IN$PR_HBAR$PR_CYAN$PR_HBAR${(e)PR_FILLBAR}$PR_HBAR$PR_SHIFT_OUT(\
 $PR_MAGENTA%$PR_PWDLEN<...<%~%<<\
-$PR_BLUE)$PR_SHIFT_IN$PR_HBAR$PR_CYAN$PR_URCORNER$PR_SHIFT_OUT\
+$PR_CYAN)$PR_SHIFT_IN$PR_HBAR$PR_URCORNER$PR_SHIFT_OUT\
 
-$PR_CYAN$PR_SHIFT_IN$PR_LLCORNER$PR_BLUE$PR_HBAR$PR_SHIFT_OUT(\
-%(?..$PR_LIGHT_RED%?$PR_BLUE:)\
+$PR_CYAN$PR_SHIFT_IN$PR_LLCORNER$PR_HBAR$PR_SHIFT_OUT(\
+%(?..$PR_LIGHT_RED%?$PR_CYAN:)\
 ${(e)PR_APM}$PR_YELLOW%D{%H:%M}\
-$PR_LIGHT_BLUE:%(!.$PR_RED.$PR_WHITE)%#$PR_BLUE)$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
+$PR_LIGHT_BLUE:%(!.$PR_RED.$PR_WHITE)%#$PR_CYAN)$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
 $PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
 $PR_NO_COLOUR '
 
-    RPROMPT=' $PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_BLUE$PR_HBAR$PR_SHIFT_OUT\
-($PR_YELLOW%D{%a,%b%d}$PR_BLUE)$PR_SHIFT_IN$PR_HBAR$PR_CYAN$PR_LRCORNER$PR_SHIFT_OUT$PR_NO_COLOUR'
+    RPROMPT=' $PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_HBAR$PR_SHIFT_OUT\
+($PR_YELLOW%D{%a,%b%d}$PR_CYAN)$PR_SHIFT_IN$PR_HBAR$PR_LRCORNER$PR_SHIFT_OUT$PR_NO_COLOUR'
 
     PS2='$PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
-$PR_BLUE$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT(\
-$PR_LIGHT_GREEN%_$PR_BLUE)$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
+$PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT(\
+$PR_LIGHT_GREEN%_$PR_CYAN)$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
 $PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT$PR_NO_COLOUR '
 }
 
