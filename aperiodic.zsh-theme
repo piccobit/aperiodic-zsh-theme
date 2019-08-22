@@ -17,12 +17,16 @@ function precmd {
 
     if [[ "$git_prompt_info_size" -gt 0 ]]; then
         git_prompt_info_size=$(( git_prompt_info_size + 6 ))
+    else
+        git_prompt_info_size=-1
     fi
 
     local virtualenv_prompt_info_size=${#${VIRTUAL_ENV##*/}}
 
     if [[ "$virtualenv_prompt_info_size" -gt 0 ]]; then
         virtualenv_prompt_info_size=$(( virtualenv_prompt_info_size + 7 ))
+    else
+        virtualenv_prompt_info_size=-1
     fi
 
     local ruby_prompt_info_text=$(ruby_prompt_info)
@@ -30,6 +34,8 @@ function precmd {
 
     if [[ "$ruby_prompt_info_size" -gt 0 ]]; then
         ruby_prompt_info_size=$(( ruby_prompt_info_size + 7 ))
+    else
+        ruby_prompt_info_size=-1
     fi
 
     if [[ "$promptsize + $pwdsize + $git_prompt_info_size + $virtualenv_prompt_info_size + $ruby_prompt_info_size" -gt $TERMWIDTH ]]; then
