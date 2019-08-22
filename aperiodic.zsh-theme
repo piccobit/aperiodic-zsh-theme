@@ -13,23 +13,29 @@ function precmd {
     local pwdsize=${#${(%):-%~}}
 
     local git_prompt_info_text=$(git_prompt_info)
-    local git_prompt_info_size=${#${git_prompt_info_text/git:/}}
+    local git_prompt_info_size=${#${git_prompt_info_text/git:}}
 
     if [[ "$git_prompt_info_size" -gt 0 ]]; then
         git_prompt_info_size=$(( git_prompt_info_size + 6 ))
     fi
 
-    local virtualenv_prompt_info_text=${VIRTUAL_ENV##*/}
-    local virtualenv_prompt_info_size=${#virtualenv_prompt_info_text}
+    local virtualenv_prompt_info_size=${#${VIRTUAL_ENV##*/}}
 
     if [[ "$virtualenv_prompt_info_size" -gt 0 ]]; then
-        virtualenv_prompt_info_size=$((virtualenv_prompt_info_size + 7))
+        virtualenv_prompt_info_size=$(( virtualenv_prompt_info_size + 7 ))
     fi
 
-    if [[ "$promptsize + $pwdsize + $git_prompt_info_size + $virtualenv_prompt_info_size" -gt $TERMWIDTH ]]; then
-            ((PR_PWDLEN=$TERMWIDTH - $promptsize - $git_prompt_info_size - $virtualenv_prompt_info_size))
+    local ruby_prompt_info_text=$(ruby_prompt_info)
+    local ruby_prompt_info_size=${#${${ruby_prompt_info_text/\(ruby-}/\)}}
+
+    if [[ "$ruby_prompt_info_size" -gt 0 ]]; then
+        ruby_prompt_info_size=$(( ruby_prompt_info_size + 7 ))
+    fi
+
+    if [[ "$promptsize + $pwdsize + $git_prompt_info_size + $virtualenv_prompt_info_size + $ruby_prompt_info_size" -gt $TERMWIDTH ]]; then
+            ((PR_PWDLEN=$TERMWIDTH - $promptsize - $git_prompt_info_size - $virtualenv_prompt_info_size - $ruby_prompt_info_size))
     else
-        PR_FILLBAR="\${(l.(($TERMWIDTH - ($promptsize + $pwdsize + $git_prompt_info_size + $virtualenv_prompt_info_size)))..${PR_HBAR}.)}"
+        PR_FILLBAR="\${(l.(($TERMWIDTH - ($promptsize + $pwdsize + $git_prompt_info_size + $virtualenv_prompt_info_size + $ruby_prompt_info_size)))..${PR_HBAR}.)}"
     fi
 
     ###
@@ -144,9 +150,10 @@ setprompt () {
     PROMPT='$PR_SET_CHARSET$PR_STITLE${(e)PR_TITLEBAR}\
 $PR_CYAN$PR_SHIFT_IN$PR_ULCORNER$PR_HBAR$PR_SHIFT_OUT(\
 %(!.$PR_RED%SROOT%s.$PR_GREEN%n)@%m:%l$PR_CYAN)\
-$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT$PR_LIGHT_GREEN${$(git_prompt_info):+"(git:$(git_prompt_info))"}$PR_CYAN\
+$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT$PR_LIGHT_GREEN${$(git_prompt_info):+"(git:${$(git_prompt_info)/git:})"}$PR_CYAN\
 $PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT$PR_LIGHT_GREEN${VIRTUAL_ENV:+"(venv:${VIRTUAL_ENV##*/})"}$PR_CYAN\
-$PR_SHIFT_IN$PR_HBAR$PR_CYAN$PR_HBAR${(e)PR_FILLBAR}$PR_HBAR$PR_SHIFT_OUT(\
+$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT$PR_LIGHT_GREEN${$(ruby_prompt_info):+"(ruby:${${$(ruby_prompt_info)/\(ruby-/}/\)})"}$PR_CYAN\
+$PR_SHIFT_IN$PR_HBAR${(e)PR_FILLBAR}$PR_HBAR$PR_SHIFT_OUT(\
 $PR_MAGENTA%$PR_PWDLEN<...<%~%<<\
 $PR_CYAN)$PR_SHIFT_IN$PR_HBAR$PR_URCORNER$PR_SHIFT_OUT\
 
