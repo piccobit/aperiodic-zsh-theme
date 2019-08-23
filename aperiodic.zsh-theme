@@ -110,6 +110,12 @@ setprompt () {
     PR_LRCORNER=${altchar[j]:--}
     PR_URCORNER=${altchar[k]:--}
 
+
+    ###
+    # Some fancy unicode characters
+    PR_SKULL=$'\u2620'
+    PR_THUMBS_UP=$'\xF0\x9F\x91\x8D'
+
     
     ###
     # Decide if we need to set titlebar text.
@@ -140,11 +146,11 @@ setprompt () {
     # APM detection
 
     if which ibam > /dev/null; then
-        PR_APM='$PR_RED(${${PR_APM_RESULT[(f)1]}[(w)-2]}%%(${${PR_APM_RESULT[(f)3]}[(w)-1]}))$PR_CYAN'
+        PR_APM='$PR_RED(${${PR_APM_RESULT[(f)1]}[(w)-2]}%%(${${PR_APM_RESULT[(f)3]}[(w)-1]}))$PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT'
     elif which apm > /dev/null; then
-        PR_APM='$PR_RED(${PR_APM_RESULT[(w)5,(w)6]/\% /%%})$PR_CYAN'
+        PR_APM='$PR_RED(${PR_APM_RESULT[(w)5,(w)6]/\% /%%})$PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT'
     elif which pmset > /dev/null; then
-        PR_APM='$PR_RED(${PR_APM_RESULT/\%/%%})$PR_CYAN'
+        PR_APM='$PR_RED(${PR_APM_RESULT/\%/%%})$PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT'
     else
         PR_APM=''
     fi
@@ -164,14 +170,14 @@ $PR_MAGENTA%$PR_PWDLEN<...<%~%<<\
 $PR_CYAN)$PR_SHIFT_IN$PR_HBAR$PR_URCORNER$PR_SHIFT_OUT\
 
 $PR_CYAN$PR_SHIFT_IN$PR_LLCORNER$PR_HBAR$PR_SHIFT_OUT(\
-%(?.${PR_LIGHT_GREEN}0.$PR_LIGHT_RED%?)$PR_CYAN\
+%(?.${PR_LIGHT_GREEN}${PR_THUMBS_UP} 0.$PR_LIGHT_RED$PR_SKULL  %?)$PR_CYAN\
 $PR_LIGHT_BLUE:%(!.$PR_RED.$PR_WHITE)%#$PR_CYAN)\
 $PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
 $PR_NO_COLOUR '
 
     RPROMPT=' $PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
 ${(e)PR_APM}\
-$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT($PR_YELLOW%D{%H:%M} - %D{%a %b %d}$PR_CYAN)$PR_SHIFT_IN$PR_HBAR$PR_LRCORNER$PR_SHIFT_OUT$PR_NO_COLOUR'
+($PR_YELLOW%D{%H:%M} - %D{%a %b %d}$PR_CYAN)$PR_SHIFT_IN$PR_HBAR$PR_LRCORNER$PR_SHIFT_OUT$PR_NO_COLOUR'
 
     PS2='$PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
 $PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT(\
