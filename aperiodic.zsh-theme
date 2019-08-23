@@ -9,7 +9,7 @@ function precmd {
     PR_FILLBAR=""
     PR_PWDLEN=""
 
-    local promptsize=${#${(%):---(%n@%m:%l)-----()--}}
+    local promptsize=${#${(%):---(%n@%m:%l)-----()}}
     local pwdsize=${#${(%):-%~}}
 
     local git_prompt_info_text=$(git_prompt_info)
@@ -52,7 +52,7 @@ function precmd {
     elif which apm > /dev/null; then
         PR_APM_RESULT=`apm`
     elif which pmset > /dev/null; then
-        PR_APM_RESULT=${$(pmset -g batt)[(w)8,(w)9]/;/}
+        PR_APM_RESULT=${$(pmset -g batt)[(w)8,(w)9]/;}
     fi
 }
 
@@ -97,27 +97,18 @@ setprompt () {
 
 
     ###
-    # See if we can use extended characters to look nicer.
-
-    typeset -A altchar
-    set -A altchar ${(s..)terminfo[acsc]}
-    PR_SET_CHARSET="%{$terminfo[enacs]%}"
-    PR_SHIFT_IN="%{$terminfo[smacs]%}"
-    PR_SHIFT_OUT="%{$terminfo[rmacs]%}"
-    PR_HBAR=${altchar[q]:--}
-    PR_ULCORNER=${altchar[l]:--}
-    PR_LLCORNER=${altchar[m]:--}
-    PR_LRCORNER=${altchar[j]:--}
-    PR_URCORNER=${altchar[k]:--}
-
-
-    ###
     # Some fancy unicode characters
-    PR_DOUBLE_RIGHT_ARROW=$'\u21D2'
-    PR_CHECKMARK=$'\u2713'
-    PR_BOLD_CROSS=$'\u2718'
-    PR_VERTICAL_AND_RIGHT=$'\u251C'
-    PR_VERTICAL_AND_LEFT=$'\u2524'
+
+    PR_ARROW=$'\u27A0'
+    PR_CHECKMARK=$'\u2705'
+    PR_CROSS=$'\u274C'
+    PR_VRBAR=$'\u251C'
+    PR_VLBAR=$'\u2524'
+    PR_HBAR=$'\u2500'
+    PR_URCORNER=$'\u256E'
+    PR_ULCORNER=$'\u256D'
+    PR_LRCORNER=$'\u256F'
+    PR_LLCORNER=$'\u2570'
 
     
     ###
@@ -149,11 +140,11 @@ setprompt () {
     # APM detection
 
     if which ibam > /dev/null; then
-        PR_APM='$PR_RED(${${PR_APM_RESULT[(f)1]}[(w)-2]}%%(${${PR_APM_RESULT[(f)3]}[(w)-1]}))$PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT'
+        PR_APM='$PR_VLBAR$PR_RED${${PR_APM_RESULT[(f)1]}[(w)-2]}%%(${${PR_APM_RESULT[(f)3]}[(w)-1]})$PR_CYAN$PR_VRBAR$PR_HBAR'
     elif which apm > /dev/null; then
-        PR_APM='$PR_RED(${PR_APM_RESULT[(w)5,(w)6]/\% /%%})$PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT'
+        PR_APM='$PR_VLBAR$PR_RED${PR_APM_RESULT[(w)5,(w)6]/\% /%%}$PR_CYAN$PR_VRBAR$PR_HBAR'
     elif which pmset > /dev/null; then
-        PR_APM='$PR_RED(${PR_APM_RESULT/\%/%%})$PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT'
+        PR_APM='$PR_VLBAR$PR_RED${PR_APM_RESULT/\%/%%}$PR_CYAN$PR_VRBAR$PR_HBAR'
     else
         PR_APM=''
     fi
@@ -163,29 +154,29 @@ setprompt () {
     # Finally, the prompt.
 
     PROMPT='$PR_SET_CHARSET$PR_STITLE${(e)PR_TITLEBAR}\
-$PR_CYAN$PR_SHIFT_IN$PR_ULCORNER$PR_HBAR$PR_SHIFT_OUT(\
-%(!.$PR_RED%SROOT%s.$PR_GREEN%n)@%m:%l$PR_CYAN)\
-${$(git_prompt_info):+"$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT$PR_VERTICAL_AND_LEFT${PR_LIGHT_GREEN}git:${$(git_prompt_info)/git:}$PR_CYAN$PR_VERTICAL_AND_RIGHT"}\
-${VIRTUAL_ENV:+"$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT$PR_VERTICAL_AND_LEFT${PR_LIGHT_GREEN}venv:${VIRTUAL_ENV##*/}$PR_CYAN$PR_VERTICAL_AND_RIGHT"}\
-${$(ruby_prompt_info):+"$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT$PR_VERTICAL_AND_LEFT${PR_LIGHT_GREEN}ruby:${${$(ruby_prompt_info)/\(ruby-/}/\)}$PR_CYAN$PR_VERTICAL_AND_RIGHT"}\
-$PR_SHIFT_IN$PR_HBAR${(e)PR_FILLBAR}$PR_HBAR$PR_SHIFT_OUT$PR_VERTICAL_AND_LEFT\
+$PR_CYAN$PR_ULCORNER$PR_VLBAR\
+%(!.$PR_RED%SROOT%s.$PR_GREEN%n)@%m:%l$PR_CYAN$PR_VRBAR\
+${$(git_prompt_info):+"$PR_HBAR$PR_VLBAR${PR_LIGHT_GREEN}git:${$(git_prompt_info)/git:}$PR_CYAN$PR_VRBAR"}\
+${VIRTUAL_ENV:+"$PR_HBAR$PR_VLBAR${PR_LIGHT_GREEN}venv:${VIRTUAL_ENV##*/}$PR_CYAN$PR_VRBAR"}\
+${$(ruby_prompt_info):+"$PR_HBAR$PR_VLBAR${PR_LIGHT_GREEN}ruby:${${$(ruby_prompt_info)/\(ruby-/}/\)}$PR_CYAN$PR_VRBAR"}\
+$PR_HBAR${(e)PR_FILLBAR}$PR_HBAR$PR_VLBAR\
 $PR_LIGHT_GREEN%$PR_PWDLEN<...<%~%<<\
-$PR_CYAN$PR_VERTICAL_AND_RIGHT$PR_SHIFT_IN$PR_HBAR$PR_URCORNER$PR_SHIFT_OUT\
+$PR_CYAN$PR_VRBAR$PR_URCORNER\
 
-$PR_CYAN$PR_SHIFT_IN$PR_LLCORNER$PR_HBAR$PR_SHIFT_OUT$PR_VERTICAL_AND_LEFT\
-%(?.${PR_LIGHT_GREEN}${PR_CHECKMARK} $PR_DOUBLE_RIGHT_ARROW 0.$PR_LIGHT_RED$PR_BOLD_CROSS $PR_DOUBLE_RIGHT_ARROW %?)$PR_CYAN\
-$PR_LIGHT_BLUE:%(!.$PR_RED.$PR_WHITE)%#$PR_CYAN$PR_VERTICAL_AND_RIGHT\
-$PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
+$PR_CYAN$PR_LLCORNER$PR_VLBAR\
+%(?.${PR_LIGHT_GREEN}${PR_CHECKMARK} $PR_ARROW 0.$PR_LIGHT_RED$PR_CROSS $PR_ARROW %?)$PR_CYAN\
+$PR_LIGHT_BLUE:%(!.$PR_RED.$PR_WHITE)%#$PR_CYAN$PR_VRBAR\
+$PR_CYAN\
 $PR_NO_COLOUR '
 
-    RPROMPT=' $PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
+    RPROMPT=' $PR_CYAN\
 ${(e)PR_APM}\
-$PR_VERTICAL_AND_LEFT$PR_YELLOW%D{%H:%M} - %D{%a %b %d}$PR_CYAN$PR_VERTICAL_AND_RIGHT$PR_SHIFT_IN$PR_HBAR$PR_LRCORNER$PR_SHIFT_OUT$PR_NO_COLOUR'
+$PR_VLBAR$PR_YELLOW%D{%H:%M} - %D{%a %b %d}$PR_CYAN$PR_VRBAR$PR_LRCORNER$PR_NO_COLOUR'
 
-    PS2='$PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
-$PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT$PR_VERTICAL_AND_LEFT\
-$PR_LIGHT_GREEN%_$PR_CYAN$PR_VERTICAL_AND_RIGHT$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT\
-$PR_CYAN$PR_SHIFT_IN$PR_HBAR$PR_SHIFT_OUT$PR_NO_COLOUR '
+    PS2='$PR_CYAN$PR_HBAR\
+$PR_CYAN$PR_HBAR$PR_VLBAR\
+$PR_LIGHT_GREEN%_$PR_CYAN$PR_VRBAR$PR_HBAR\
+$PR_CYAN$PR_NO_COLOUR '
 }
 
 setprompt
