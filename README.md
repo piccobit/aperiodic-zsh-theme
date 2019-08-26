@@ -10,7 +10,7 @@ This ZSH theme is based heavily on an excellent blog entry from [Phil Gold](http
 
 ## Installation
 
-Put `aperiodic.zsh-theme` in your `~/.oh-my-zhs/custom/themes` directory, then in your `~/.zshrc` file:
+Put `aperiodic.zsh-theme` in your `~/.oh-my-zsh/custom/themes` directory, then in your `~/.zshrc` file:
 
 ```
 ZSH_THEME="aperiodic"
