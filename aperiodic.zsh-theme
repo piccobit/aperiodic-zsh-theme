@@ -99,7 +99,7 @@ setprompt () {
     ###
     # Some fancy unicode characters
 
-    PR_ARROW=$'\u27A0'
+    PR_ARROW=$'\u27A1'
     PR_CHECKMARK=$'\u2714'
     PR_CROSS=$'\u2718'
     PR_VRBAR=$'\u251C'
